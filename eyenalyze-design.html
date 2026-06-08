@@ -1,0 +1,1758 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eyenalyze — UI Design Specification</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --canvas: #111214;
+    --frame-bg: #1a1b1e;
+    --label: #555860;
+    --teal: #0d9488;
+    --orange: #f97316;
+    --accent: var(--orange);
+    --zinc-50: #fafafa;
+    --zinc-100: #f4f4f5;
+    --zinc-200: #e4e4e7;
+    --zinc-300: #d4d4d8;
+    --zinc-400: #a1a1aa;
+    --zinc-500: #71717a;
+    --zinc-600: #52525b;
+    --zinc-700: #3f3f46;
+    --zinc-800: #27272a;
+    --zinc-900: #18181b;
+    --zinc-950: #09090b;
+  }
+
+  html, body {
+    background: var(--canvas);
+    min-height: 100vh;
+    font-family: 'Sora', system-ui, sans-serif;
+    color: #e4e4e7;
+    overflow-x: auto;
+  }
+
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #0d0e10;
+    border-bottom: 1px solid #2a2b2f;
+    padding: 14px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .app-badge {
+    background: var(--orange);
+    color: #000;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .header-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e4e4e7;
+    letter-spacing: -0.3px;
+  }
+
+  .header-sub {
+    font-size: 11px;
+    color: var(--zinc-500);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .header-meta {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .meta-item {
+    font-size: 11px;
+    color: var(--zinc-500);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .meta-item span {
+    color: var(--orange);
+  }
+
+  .canvas-area {
+    padding: 60px 60px 120px;
+    min-width: 1800px;
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--zinc-600);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--zinc-800);
+  }
+
+  .frames-row {
+    display: flex;
+    gap: 60px;
+    align-items: flex-start;
+    margin-bottom: 80px;
+    flex-wrap: nowrap;
+  }
+
+  .frame-wrapper {
+    flex-shrink: 0;
+  }
+
+  .frame-label {
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--label);
+    margin-bottom: 10px;
+    letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .frame-label-num {
+    background: #222327;
+    border: 1px solid #2a2b30;
+    color: var(--orange);
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+
+  .frame {
+    background: #000;
+    border: 1px solid #222327;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .frame-dims {
+    font-size: 10px;
+    color: var(--zinc-700);
+    margin-top: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    text-align: center;
+  }
+
+  /* ===== SHARED SCREEN COMPONENTS ===== */
+
+  /* Screen font reset */
+  .screen {
+    font-family: 'Sora', system-ui, sans-serif;
+    color: #e4e4e7;
+    background: #000;
+  }
+
+  /* --- NAVBAR shared --- */
+  .s-navbar {
+    height: 44px;
+    background: #000;
+    border-bottom: 1px solid #1c1c1e;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  .s-logo {
+    font-size: 13px;
+    font-weight: 700;
+    color: #e4e4e7;
+    letter-spacing: -0.5px;
+  }
+
+  .s-logo-accent {
+    color: var(--orange);
+  }
+
+  .s-nav-spacer { flex: 1; }
+
+  .s-avatar {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #000;
+  }
+
+  /* ===== SCREEN 1: LOGIN ===== */
+  .screen-login {
+    width: 420px;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 560px;
+    padding: 60px 40px;
+    gap: 48px;
+  }
+
+  .login-logo-block {
+    align-self: flex-start;
+  }
+
+  .login-wordmark {
+    font-size: 20px;
+    font-weight: 700;
+    color: #e4e4e7;
+    letter-spacing: -0.8px;
+  }
+
+  .login-tagline {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-self: flex-start;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .login-h1 {
+    font-size: 22px;
+    font-weight: 600;
+    color: #fafafa;
+    line-height: 1.35;
+    letter-spacing: -0.5px;
+    max-width: 220px;
+  }
+
+  .login-p {
+    font-size: 12px;
+    color: var(--zinc-500);
+    line-height: 1.7;
+    max-width: 280px;
+  }
+
+  .login-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    align-self: flex-start;
+  }
+
+  .btn-google {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 42px;
+    width: 100%;
+    background: #fafafa;
+    border-radius: 100px;
+    border: none;
+    font-size: 12px;
+    font-weight: 600;
+    color: #111;
+    cursor: pointer;
+    font-family: 'Sora', sans-serif;
+  }
+
+  .google-icon {
+    width: 16px;
+    height: 16px;
+    flex-shrink: 0;
+  }
+
+  .btn-github {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 42px;
+    width: 100%;
+    background: transparent;
+    border-radius: 100px;
+    border: 1px solid rgba(255,255,255,0.12);
+    font-size: 12px;
+    font-weight: 600;
+    color: #e4e4e7;
+    cursor: pointer;
+    font-family: 'Sora', sans-serif;
+  }
+
+  /* ===== SCREEN 2: DASHBOARD ===== */
+  .screen-dashboard {
+    width: 480px;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .dash-main {
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    flex: 1;
+  }
+
+  .dash-profile {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-bottom: 20px;
+  }
+
+  .dash-username {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fafafa;
+    letter-spacing: -0.5px;
+  }
+
+  .dash-email-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--zinc-400);
+  }
+
+  .dash-edit-btn {
+    margin-top: 12px;
+    border: 1px solid var(--orange);
+    color: var(--orange);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 0;
+    border-radius: 5px;
+    text-align: center;
+    width: 100%;
+    cursor: pointer;
+  }
+
+  .dash-separator {
+    border: none;
+    border-top: 1px solid var(--zinc-800);
+    margin: 20px 0;
+  }
+
+  .dash-toolbar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .dash-search {
+    flex: 1;
+    height: 30px;
+    background: var(--zinc-900);
+    border: 1px solid var(--zinc-700);
+    border-radius: 3px;
+    padding: 0 10px;
+    font-size: 11px;
+    color: var(--zinc-400);
+  }
+
+  .dash-search::placeholder { color: var(--zinc-600); }
+
+  .dash-btn-sm {
+    height: 30px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0 10px;
+    background: var(--orange);
+    color: #000;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    white-space: nowrap;
+    border: none;
+  }
+
+  .repo-list { display: flex; flex-direction: column; }
+
+  .repo-item {
+    display: flex;
+    gap: 10px;
+    border-top: 1px solid var(--zinc-800);
+    padding: 14px 0;
+  }
+
+  .repo-content { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+
+  .repo-name-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .repo-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fafafa;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .repo-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--orange);
+    color: #000;
+  }
+
+  .repo-desc {
+    font-size: 11px;
+    color: var(--zinc-500);
+    line-height: 1.5;
+  }
+
+  .repo-tags {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+  }
+
+  .repo-tag {
+    background: var(--zinc-900);
+    color: #f97316aa;
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 3px;
+  }
+
+  .repo-meta {
+    font-size: 10px;
+    color: var(--zinc-600);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 4px;
+  }
+
+  .repo-pin-btn {
+    align-self: flex-start;
+    margin-top: 14px;
+    border: 1px solid var(--zinc-700);
+    background: var(--zinc-900);
+    color: var(--zinc-300);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .load-more-btn {
+    margin-top: 16px;
+    border: 1px solid var(--orange);
+    color: var(--orange);
+    background: transparent;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 7px;
+    border-radius: 5px;
+    text-align: center;
+    width: 100%;
+    cursor: pointer;
+  }
+
+  /* ===== SCREEN 3: NEW REPO ===== */
+  .screen-newrepo {
+    width: 480px;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .newrepo-main {
+    padding: 24px 24px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .newrepo-h1 {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--orange);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .newrepo-p {
+    font-size: 10px;
+    color: var(--zinc-500);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .step-row {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 0;
+  }
+
+  .step-track {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--zinc-900);
+    border: 1px solid var(--zinc-700);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--zinc-400);
+    flex-shrink: 0;
+    z-index: 1;
+  }
+
+  .step-line {
+    flex: 1;
+    width: 1px;
+    background: var(--zinc-800);
+    margin-top: -1px;
+  }
+
+  .step-content {
+    padding-top: 3px;
+    padding-bottom: 16px;
+    flex: 1;
+  }
+
+  .step-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #fafafa;
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 14px;
+  }
+
+  .form-field { margin-bottom: 12px; }
+
+  .form-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--zinc-500);
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .form-input {
+    width: 100%;
+    height: 30px;
+    background: var(--zinc-900);
+    border: 1px solid var(--zinc-700);
+    border-radius: 3px;
+    padding: 0 10px;
+    font-size: 11px;
+    color: var(--zinc-300);
+    font-family: 'Sora', sans-serif;
+  }
+
+  .form-hint {
+    font-size: 10px;
+    color: var(--zinc-600);
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 4px;
+    padding-left: 2px;
+  }
+
+  .form-success {
+    font-size: 10px;
+    color: var(--orange);
+    font-weight: 700;
+    margin-top: 3px;
+    padding-left: 2px;
+  }
+
+  .tags-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .tag-pill {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--zinc-900);
+    color: #f97316aa;
+    border: 1px solid var(--zinc-800);
+    font-size: 10px;
+    padding: 3px 7px;
+    border-radius: 3px;
+  }
+
+  .config-card {
+    background: var(--zinc-900);
+    border: 1px solid var(--zinc-700);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+
+  .config-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+  }
+
+  .config-row + .config-row {
+    border-top: 1px solid var(--zinc-800);
+  }
+
+  .config-row-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--orange);
+    margin-bottom: 2px;
+  }
+
+  .config-row-desc {
+    font-size: 10px;
+    color: var(--zinc-500);
+  }
+
+  .config-select-mock {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--zinc-300);
+    border: 1px solid var(--zinc-700);
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: var(--zinc-800);
+    white-space: nowrap;
+  }
+
+  .toggle-mock {
+    width: 32px;
+    height: 18px;
+    background: var(--orange);
+    border-radius: 9px;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .toggle-mock::after {
+    content: '';
+    position: absolute;
+    right: 2px;
+    top: 2px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #000;
+  }
+
+  .create-btn {
+    height: 34px;
+    background: var(--orange);
+    color: #000;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    margin-top: 16px;
+    width: 100%;
+    font-family: 'Sora', sans-serif;
+  }
+
+  /* ===== SCREEN 4: REPO DETAIL ===== */
+  .screen-repodetail {
+    width: 480px;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .repodetail-main {
+    padding: 24px 24px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .repo-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--orange);
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+
+  .repo-desc2 {
+    font-size: 12px;
+    color: var(--zinc-400);
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  .repo-license-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+    margin-bottom: 16px;
+  }
+
+  .repo-license-item {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--zinc-500);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .tabs-bar {
+    display: flex;
+    gap: 2px;
+    background: var(--zinc-900);
+    border-radius: 6px;
+    padding: 3px;
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+
+  .tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--zinc-500);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .tab.active {
+    background: #000;
+    color: var(--orange);
+    border: 1px solid var(--zinc-800);
+  }
+
+  .separator-line {
+    border: none;
+    border-top: 1px solid var(--zinc-800);
+    margin-bottom: 16px;
+  }
+
+  /* Train model screen */
+  .train-h1 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--orange);
+    margin-bottom: 6px;
+    letter-spacing: -0.3px;
+  }
+
+  .train-p {
+    font-size: 11px;
+    color: var(--zinc-500);
+    line-height: 1.6;
+    margin-bottom: 16px;
+  }
+
+  /* ===== SCREEN 5: UPLOAD ===== */
+  .dropzone {
+    border: 2px dashed var(--zinc-700);
+    border-radius: 4px;
+    background: var(--zinc-950);
+    padding: 28px 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .dropzone-icon {
+    width: 36px;
+    height: 36px;
+    color: var(--zinc-600);
+  }
+
+  .dropzone-text {
+    font-size: 11px;
+    color: var(--zinc-500);
+  }
+
+  .dropzone-text span { color: var(--orange); }
+
+  .dropzone-hint {
+    font-size: 10px;
+    color: var(--zinc-700);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .dropzone-active {
+    border-color: var(--orange);
+    background: rgba(249, 115, 22, 0.04);
+  }
+
+  .file-chip {
+    margin-top: 12px;
+    background: var(--zinc-900);
+    border: 1px solid var(--zinc-800);
+    border-radius: 3px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+  }
+
+  .file-chip-label {
+    background: var(--orange);
+    color: #000;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .file-chip-name {
+    color: var(--orange);
+    flex: 1;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .file-chip-size { color: var(--zinc-500); }
+
+  /* ===== SCREEN 6: URL IMPORT ===== */
+  .url-section { margin-top: 4px; }
+
+  .url-input-row {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+  }
+
+  .url-input-mock {
+    flex: 1;
+    height: 30px;
+    background: var(--zinc-900);
+    border: 1px solid var(--zinc-700);
+    border-radius: 3px;
+    padding: 0 10px;
+    font-size: 10px;
+    color: var(--zinc-500);
+    font-family: 'JetBrains Mono', monospace;
+    display: flex;
+    align-items: center;
+  }
+
+  .progress-bar-wrap {
+    margin-top: 12px;
+    background: var(--zinc-900);
+    border: 1px solid var(--orange);
+    border-radius: 3px;
+    height: 28px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+  }
+
+  .progress-fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    background: rgba(249, 115, 22, 0.15);
+    width: 65%;
+  }
+
+  .progress-text {
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--orange);
+    position: relative;
+    z-index: 1;
+  }
+
+  /* README */
+  .readme-wrap {
+    background: var(--zinc-950);
+    border: 1px solid var(--zinc-800);
+    border-radius: 4px;
+    padding: 16px;
+  }
+
+  .readme-h1 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fafafa;
+    letter-spacing: -0.3px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--zinc-800);
+  }
+
+  .readme-section {
+    margin-bottom: 12px;
+  }
+
+  .readme-h2 {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--zinc-200);
+    margin-bottom: 6px;
+  }
+
+  .readme-p {
+    font-size: 11px;
+    color: var(--zinc-500);
+    line-height: 1.7;
+    margin-bottom: 6px;
+  }
+
+  .readme-code {
+    background: var(--zinc-900);
+    border: 1px solid var(--zinc-800);
+    border-radius: 3px;
+    padding: 8px 12px;
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--orange);
+    line-height: 1.6;
+    margin-top: 6px;
+  }
+
+  .readme-badge-row {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .readme-badge {
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+
+  .readme-badge.green { background: #166534; color: #86efac; }
+  .readme-badge.blue { background: #1e3a5f; color: #93c5fd; }
+  .readme-badge.orange { background: #7c2d12; color: #fdba74; }
+
+  /* ===== ANNOTATIONS ===== */
+  .annotations {
+    margin-top: 60px;
+    border-top: 1px solid var(--zinc-800);
+    padding-top: 40px;
+  }
+
+  .annot-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 20px;
+  }
+
+  .annot-card {
+    background: #111215;
+    border: 1px solid #1e1f23;
+    border-radius: 6px;
+    padding: 16px;
+  }
+
+  .annot-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--zinc-300);
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .annot-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--orange);
+  }
+
+  .color-swatch-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .color-swatch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .color-box {
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+  }
+
+  .color-label {
+    font-size: 9px;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--zinc-600);
+  }
+
+  .annot-token {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid var(--zinc-900);
+  }
+
+  .annot-token-name {
+    font-size: 10px;
+    color: var(--zinc-500);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .annot-token-val {
+    font-size: 10px;
+    color: var(--zinc-300);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .type-sample {
+    margin-bottom: 8px;
+  }
+
+  .type-name { color: var(--zinc-600); font-size: 10px; font-family: 'JetBrains Mono', monospace; margin-bottom: 2px; }
+  .type-preview { color: var(--zinc-200); }
+  .type-preview.hero { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+  .type-preview.heading { font-size: 16px; font-weight: 700; }
+  .type-preview.body { font-size: 12px; color: var(--zinc-400); line-height: 1.6; }
+  .type-preview.caption { font-size: 10px; color: var(--zinc-500); font-family: 'JetBrains Mono', monospace; }
+
+  /* Dot grid background on canvas */
+  .canvas-area {
+    background-image: radial-gradient(circle, #2a2b30 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #0d0e10; }
+  ::-webkit-scrollbar-thumb { background: #2a2b30; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3a3b40; }
+
+  /* inline svg icons */
+  .icon-sm { width: 12px; height: 12px; display: inline-block; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="app-badge">EYENALYZE</div>
+    <div>
+      <div class="header-title">UI Design Specification</div>
+      <div class="header-sub">6 screens · dark mode · Next.js + Tailwind CSS</div>
+    </div>
+  </div>
+  <div class="header-meta">
+    <div class="meta-item">accent: <span>#f97316</span></div>
+    <div class="meta-item">bg: <span>#000000</span></div>
+    <div class="meta-item">font: <span>Sora / JetBrains Mono</span></div>
+    <div class="meta-item">mode: <span>Dark</span></div>
+  </div>
+</div>
+
+<div class="canvas-area">
+
+  <!-- Row 1: Login + Dashboard + New Repo -->
+  <div class="section-label">Core Screens</div>
+  <div class="frames-row">
+
+    <!-- FRAME 1: LOGIN -->
+    <div class="frame-wrapper">
+      <div class="frame-label"><span class="frame-label-num">01</span> Login Page · /login</div>
+      <div class="frame" style="width: 420px;">
+        <div class="screen screen-login">
+          <div class="login-logo-block">
+            <div class="login-wordmark">eye<span style="color:var(--orange)">nalyze</span></div>
+          </div>
+          <div class="login-tagline">
+            <div class="login-h1">Build your Own CNN Models.</div>
+            <div class="login-p">Authenticate to start training or managing your CNN projects.</div>
+          </div>
+          <div class="login-buttons">
+            <div class="btn-google">
+              <svg class="google-icon" viewBox="0 0 24 24">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+              </svg>
+              Sign in with Google
+            </div>
+            <div class="btn-github">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+              </svg>
+              Sign in with GitHub
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="frame-dims">420 × 560</div>
+    </div>
+
+    <!-- FRAME 2: DASHBOARD -->
+    <div class="frame-wrapper">
+      <div class="frame-label"><span class="frame-label-num">02</span> Dashboard · /[id]</div>
+      <div class="frame" style="width: 480px;">
+        <div class="screen screen-dashboard">
+          <div class="s-navbar">
+            <div class="s-logo">eye<span class="s-logo-accent">nalyze</span></div>
+            <div class="s-nav-spacer"></div>
+            <div class="s-avatar">B</div>
+          </div>
+          <div class="dash-main">
+            <div class="dash-profile">
+              <div class="dash-username">Bang Ben</div>
+              <div class="dash-email-row">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                bangben@gmail.com
+              </div>
+              <div class="dash-edit-btn">Edit Profile</div>
+            </div>
+            <hr class="dash-separator">
+            <div class="dash-toolbar">
+              <div class="dash-search" style="display:flex;align-items:center;color:var(--zinc-600);font-size:11px;">Search repositories...</div>
+              <div class="dash-btn-sm">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3a2 2 0 0 0-2 2"/><path d="M19 3a2 2 0 0 1 2 2"/><path d="M21 19a2 2 0 0 1-2 2"/><path d="M5 21a2 2 0 0 1-2-2"/><path d="M9 3h1"/><path d="M9 21h1"/><path d="M14 3h1"/><path d="M14 21h1"/><path d="M3 9v1"/><path d="M21 9v1"/><path d="M3 14v1"/><path d="M21 14v1"/></svg>
+                Type
+              </div>
+              <div class="dash-btn-sm">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+                New
+              </div>
+            </div>
+            <div class="repo-list">
+              <!-- repo 1 -->
+              <div class="repo-item">
+                <div class="repo-content">
+                  <div class="repo-name-row">
+                    <div class="repo-name">retinal-disease-cnn</div>
+                    <div class="repo-badge">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                      Public
+                    </div>
+                  </div>
+                  <div class="repo-desc">CNN model for classifying retinal diseases from fundus images using ResNet50 architecture.</div>
+                  <div class="repo-tags">
+                    <div class="repo-tag">medical</div>
+                    <div class="repo-tag">retina</div>
+                    <div class="repo-tag">resnet</div>
+                  </div>
+                  <div class="repo-meta">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Updated At: 22/05/2026
+                  </div>
+                </div>
+                <div class="repo-pin-btn">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>
+                  Pin
+                </div>
+              </div>
+              <!-- repo 2 -->
+              <div class="repo-item">
+                <div class="repo-content">
+                  <div class="repo-name-row">
+                    <div class="repo-name">plant-disease-detector</div>
+                    <div class="repo-badge" style="background:var(--zinc-800);color:var(--zinc-400);">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                      Private
+                    </div>
+                  </div>
+                  <div class="repo-desc">EfficientNet-based classifier for 38 plant diseases from leaf images.</div>
+                  <div class="repo-tags">
+                    <div class="repo-tag">agriculture</div>
+                    <div class="repo-tag">efficientnet</div>
+                  </div>
+                  <div class="repo-meta">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Updated At: 18/05/2026
+                  </div>
+                </div>
+                <div class="repo-pin-btn">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>
+                  Pin
+                </div>
+              </div>
+              <!-- repo 3 -->
+              <div class="repo-item">
+                <div class="repo-content">
+                  <div class="repo-name-row">
+                    <div class="repo-name">mnist-baseline</div>
+                    <div class="repo-badge">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                      Public
+                    </div>
+                  </div>
+                  <div class="repo-desc">Classic MNIST digit recognizer, baseline LeNet architecture.</div>
+                  <div class="repo-tags">
+                    <div class="repo-tag">mnist</div>
+                    <div class="repo-tag">lenet</div>
+                  </div>
+                  <div class="repo-meta">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Updated At: 12/05/2026
+                  </div>
+                </div>
+                <div class="repo-pin-btn">
+                  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>
+                  Pin
+                </div>
+              </div>
+            </div>
+            <div class="load-more-btn">Load More</div>
+          </div>
+        </div>
+      </div>
+      <div class="frame-dims">480 × auto</div>
+    </div>
+
+    <!-- FRAME 3: NEW REPO -->
+    <div class="frame-wrapper">
+      <div class="frame-label"><span class="frame-label-num">03</span> New Repository · /[id]/new</div>
+      <div class="frame" style="width: 480px;">
+        <div class="screen screen-newrepo">
+          <div class="s-navbar">
+            <div class="s-logo">eye<span class="s-logo-accent">nalyze</span></div>
+            <div class="s-nav-spacer"></div>
+            <div class="s-avatar">B</div>
+          </div>
+          <div class="newrepo-main">
+            <div class="newrepo-h1">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
+              Create New Repository
+            </div>
+            <div class="newrepo-p">Repositories store your custom CNN models, architecture weights, and training logs. Required fields are marked with an asterisk (*).</div>
+
+            <!-- Step 1: General -->
+            <div class="step-row">
+              <div class="step-track">
+                <div class="step-num">1</div>
+                <div class="step-line"></div>
+              </div>
+              <div class="step-content">
+                <div class="step-title">General</div>
+                <div class="form-field">
+                  <div class="form-label">Repository Name *</div>
+                  <div class="form-input" style="display:flex;align-items:center;">retinal-disease-cnn</div>
+                  <div class="form-success">Name <strong>retinal-disease-cnn</strong> is available</div>
+                  <div class="form-hint">Great repository names are short and memorable.</div>
+                </div>
+                <div class="form-field">
+                  <div class="form-label">Description *</div>
+                  <div style="min-height:52px;background:var(--zinc-900);border:1px solid var(--zinc-700);border-radius:3px;padding:8px 10px;font-size:11px;color:var(--zinc-400);line-height:1.5;">CNN model for classifying retinal diseases from fundus images</div>
+                  <div class="form-hint">42 / 350</div>
+                </div>
+                <div class="form-field">
+                  <div class="form-label">Tags *</div>
+                  <div class="tags-row">
+                    <div class="tag-pill">medical <span style="color:var(--zinc-600);font-size:10px;cursor:pointer;">✕</span></div>
+                    <div class="tag-pill">retina <span style="color:var(--zinc-600);font-size:10px;cursor:pointer;">✕</span></div>
+                    <div class="tag-pill">resnet <span style="color:var(--zinc-600);font-size:10px;cursor:pointer;">✕</span></div>
+                    <div class="form-input" style="width:80px;height:24px;padding:0 6px;font-size:10px;display:flex;align-items:center;color:var(--zinc-600);">Add tag...</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 2: Configuration -->
+            <div class="step-row">
+              <div class="step-track">
+                <div class="step-num">2</div>
+                <div class="step-line" style="background:transparent;"></div>
+              </div>
+              <div class="step-content">
+                <div class="step-title">Configuration</div>
+                <div class="config-card">
+                  <div class="config-row">
+                    <div>
+                      <div class="config-row-title">Choose Visibility</div>
+                      <div class="config-row-desc">Choose who can see and download this repository</div>
+                    </div>
+                    <div class="config-select-mock">
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                      Public
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
+                  </div>
+                  <div class="config-row">
+                    <div>
+                      <div class="config-row-title">Add README</div>
+                      <div class="config-row-desc">READMEs can be used as longer descriptions.</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:6px;">
+                      <div style="font-size:10px;font-weight:700;color:var(--zinc-300);">On</div>
+                      <div class="toggle-mock"></div>
+                    </div>
+                  </div>
+                  <div class="config-row">
+                    <div>
+                      <div class="config-row-title">Add License</div>
+                      <div class="config-row-desc">Licenses explain how others can use your code.</div>
+                    </div>
+                    <div class="config-select-mock">
+                      MIT
+                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                    </div>
+                  </div>
+                </div>
+                <div class="create-btn">Create Repository</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="frame-dims">480 × auto</div>
+    </div>
+
+  </div><!-- end row 1 -->
+
+  <!-- Row 2: Repo Detail screens -->
+  <div class="section-label">Repository Detail Screens · /[id]/[name]</div>
+  <div class="frames-row">
+
+    <!-- FRAME 4: TRAIN MODEL - DATASET SELECTION -->
+    <div class="frame-wrapper">
+      <div class="frame-label"><span class="frame-label-num">04</span> Train Model — Dataset Selection</div>
+      <div class="frame" style="width: 480px;">
+        <div class="screen screen-repodetail">
+          <div class="s-navbar">
+            <div class="s-logo">eye<span class="s-logo-accent">nalyze</span></div>
+            <div class="s-nav-spacer"></div>
+            <div class="s-avatar">B</div>
+          </div>
+          <div class="repodetail-main">
+            <!-- Repo header -->
+            <div class="repo-title">retinal-disease-cnn</div>
+            <div class="repo-desc2">CNN model for classifying retinal diseases from fundus images using ResNet50 architecture.</div>
+            <div class="repo-tags" style="margin-bottom:8px;">
+              <div class="repo-tag">medical</div>
+              <div class="repo-tag">retina</div>
+              <div class="repo-tag">resnet</div>
+            </div>
+            <div class="repo-license-row">
+              <div class="repo-license-item">
+                <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8.75.75V2h.985c.304 0 .603.08.867.231l1.29.736c.038.022.08.033.124.033h2.234a.75.75 0 0 1 0 1.5h-.427l2.111 4.692a.75.75 0 0 1-.154.838l-.53-.53.529.531-.001.002-.002.002-.006.006-.006.005-.01.01-.045.04c-.21.176-.441.327-.686.45C14.556 10.78 13.88 11 13 11a4.498 4.498 0 0 1-2.023-.454 3.544 3.544 0 0 1-.686-.45l-.045-.04-.016-.015-.006-.006-.004-.004v-.001a.75.75 0 0 1-.154-.838L12.178 4.5h-.162c-.305 0-.604-.079-.868-.231l-1.29-.736a.245.245 0 0 0-.124-.033H8.75V13h2.5a.75.75 0 0 1 0 1.5h-6.5a.75.75 0 0 1 0-1.5h2.5V3.5h-.984a.245.245 0 0 0-.124.033l-1.289.737c-.265.15-.564.23-.869.23h-.162l2.112 4.692a.75.75 0 0 1-.154.838l-.53-.53.529.531-.001.002-.002.002-.006.006-.016.015-.045.04c-.21.176-.441.327-.686.45C4.556 10.78 3.88 11 3 11a4.498 4.498 0 0 1-2.023-.454 3.544 3.544 0 0 1-.686-.45l-.045-.04-.016-.015-.006-.006-.004-.004v-.001a.75.75 0 0 1-.154-.838L2.178 4.5H1.75a.75.75 0 0 1 0-1.5h2.234a.249.249 0 0 0 .125-.033l1.288-.737c.265-.15.564-.23.869-.23h.984V.75a.75.75 0 0 1 1.5 0Zm2.945 8.477c.285.135.718.273 1.305.273s1.02-.138 1.305-.273L13 6.327Zm-10 0c.285.135.718.273 1.305.273s1.02-.138 1.305-.273L3 6.327Z"/></svg>
+                License ↗
+              </div>
+              <div class="repo-license-item">Updated At: June 7th, 2026</div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs-bar">
+              <div class="tab active">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 0v10l5 5"/></svg>
+                Train Model
+              </div>
+              <div class="tab">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 9 6 6m0-6-6 6"/></svg>
+                Try Model
+              </div>
+              <div class="tab">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                README.md
+              </div>
+            </div>
+            <hr class="separator-line">
+
+            <!-- Train content -->
+            <div class="train-h1">Ready to train your model?</div>
+            <div class="train-p">Follow the steps below to create your own CNN model. <span style="color:var(--orange);cursor:pointer;">Learn more ↗</span></div>
+
+            <!-- Step 1: Dataset -->
+            <div class="step-row">
+              <div class="step-track">
+                <div class="step-num">1</div>
+                <div class="step-line"></div>
+              </div>
+              <div class="step-content">
+                <div class="step-title">Dataset</div>
+                <div class="form-field">
+                  <div class="form-label">Dataset Type *</div>
+                  <div class="config-select-mock" style="width:fit-content;margin-top:8px;font-size:11px;padding:6px 12px;">
+                    Choose Dataset Type
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                </div>
+                <!-- Options shown as dropdown mockup -->
+                <div style="background:var(--zinc-900);border:1px solid var(--zinc-700);border-radius:4px;overflow:hidden;width:fit-content;margin-top:4px;">
+                  <div style="display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:11px;color:var(--zinc-300);border-bottom:1px solid var(--zinc-800);">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                    Import from URL
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:11px;color:var(--zinc-300);border-bottom:1px solid var(--zinc-800);background:rgba(249,115,22,0.08);">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--orange)" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    <span style="color:var(--orange);">Upload .zip File</span>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;padding:8px 14px;font-size:11px;color:var(--zinc-300);">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+                    Create In Place
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="frame-dims">480 × auto</div>
+    </div>
+
+    <!-- FRAME 5: UPLOAD ZIP -->
+    <div class="frame-wrapper">
+      <div class="frame-label"><span class="frame-label-num">05</span> Train Model — Upload Dataset (.zip)</div>
+      <div class="frame" style="width: 480px;">
+        <div class="screen screen-repodetail">
+          <div class="s-navbar">
+            <div class="s-logo">eye<span class="s-logo-accent">nalyze</span></div>
+            <div class="s-nav-spacer"></div>
+            <div class="s-avatar">B</div>
+          </div>
+          <div class="repodetail-main">
+            <div class="repo-title">plant-disease-detector</div>
+            <div class="repo-desc2">EfficientNet-based classifier for 38 plant diseases from leaf images.</div>
+            <div class="repo-tags" style="margin-bottom:8px;">
+              <div class="repo-tag">agriculture</div>
+              <div class="repo-tag">efficientnet</div>
+            </div>
+            <div class="tabs-bar">
+              <div class="tab active">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 0v10l5 5"/></svg>
+                Train Model
+              </div>
+              <div class="tab">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 9 6 6m0-6-6 6"/></svg>
+                Try Model
+              </div>
+              <div class="tab">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                README.md
+              </div>
+            </div>
+            <hr class="separator-line">
+
+            <div class="train-h1">Ready to train your model?</div>
+            <div class="train-p">Select dataset type: <strong style="color:var(--orange);">Upload .zip File</strong></div>
+
+            <div class="step-row">
+              <div class="step-track">
+                <div class="step-num">1</div>
+                <div class="step-line"></div>
+              </div>
+              <div class="step-content">
+                <div class="step-title">Dataset</div>
+                <div style="margin-bottom:12px;">
+                  <div class="form-label">Dataset Type *</div>
+                  <div class="config-select-mock" style="width:fit-content;margin-top:8px;font-size:11px;padding:6px 12px;">
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    Upload .zip File
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+                  </div>
+                </div>
+
+                <!-- Dropzone with file loaded -->
+                <div class="dropzone dropzone-active" style="border-color:var(--orange);background:rgba(249,115,22,0.04);">
+                  <svg class="dropzone-icon" style="color:var(--orange);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                  </svg>
+                  <div class="dropzone-text">Drag and drop .zip file here or <span>browse</span></div>
+                  <div class="dropzone-hint">Maximum file size: 500 MB</div>
+                  <!-- File chip -->
+                  <div class="file-chip" style="width:100%;max-width:340px;">
+                    <div class="file-chip-label">ZIP</div>
+                    <div class="file-chip-name">plant-village-dataset.zip</div>
+                    <div class="file-chip-size">247.3 MB</div>
+                    <div style="color:var(--zinc-600);cursor:pointer;font-size:14px;">✕</div>
+                  </div>
+                </div>
+
+                <!-- Upload button -->
+                <div style="display:flex;align-items:center;gap:8px;margin-top:12px;height:30px;width:fit-content;padding:0 14px;background:var(--orange);border-radius:3px;font-size:11px;font-weight:700;color:#000;cursor:pointer;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  Upload to Server
+                </div>
+
+                <!-- Progress state (uploading) -->
+                <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--zinc-800);">
+                  <div style="font-size:10px;font-weight:700;color:var(--orange);font-family:'JetBrains Mono',monospace;margin-bottom:8px;">Progress: 65% — Uploading to storage...</div>
+                  <div class="file-chip" style="position:relative;overflow:hidden;width:100%;">
+                    <div class="file-chip-label">ZIP</div>
+                    <div class="file-chip-name">plant-village-dataset.zip</div>
+                    <div class="file-chip-size">247.3 MB</div>
+                    <div class="progress-fill" style="width:65%;position:absolute;left:0;top:0;bottom:0;background:rgba(249,115,22,0.15);"></div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;margin-top:10px;height:30px;width:fit-content;padding:0 14px;background:var(--zinc-700);border-radius:3px;font-size:11px;font-weight:700;color:var(--zinc-400);cursor:not-allowed;">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite;"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                    Uploading...
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="frame-dims">480 × auto</div>
+    </div>
+
+    <!-- FRAME 6: README -->
+    <div class="frame-wrapper">
+      <div class="frame-label"><span class="frame-label-num">06</span> Repository Detail — README.md</div>
+      <div class="frame" style="width: 480px;">
+        <div class="screen screen-repodetail">
+          <div class="s-navbar">
+            <div class="s-logo">eye<span class="s-logo-accent">nalyze</span></div>
+            <div class="s-nav-spacer"></div>
+            <div class="s-avatar">B</div>
+          </div>
+          <div class="repodetail-main">
+            <div class="repo-title">mnist-baseline</div>
+            <div class="repo-desc2">Classic MNIST digit recognizer, baseline LeNet architecture.</div>
+            <div class="repo-tags" style="margin-bottom:8px;">
+              <div class="repo-tag">mnist</div>
+              <div class="repo-tag">lenet</div>
+            </div>
+            <div class="repo-license-row">
+              <div class="repo-license-item">License ↗</div>
+              <div class="repo-license-item">Updated At: May 12th, 2026</div>
+            </div>
+
+            <div class="tabs-bar">
+              <div class="tab">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 0v10l5 5"/></svg>
+                Train Model
+              </div>
+              <div class="tab">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="m9 9 6 6m0-6-6 6"/></svg>
+                Try Model
+              </div>
+              <div class="tab active">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                README.md
+              </div>
+            </div>
+            <hr class="separator-line">
+
+            <!-- README content -->
+            <div class="readme-wrap">
+              <div class="readme-h1">mnist-baseline</div>
+              <div class="readme-badge-row">
+                <div class="readme-badge green">accuracy: 99.2%</div>
+                <div class="readme-badge blue">Python 3.10</div>
+                <div class="readme-badge orange">MIT License</div>
+              </div>
+              <div class="readme-section">
+                <div class="readme-h2">📌 Overview</div>
+                <div class="readme-p">A minimal but complete implementation of LeNet-5 trained on the MNIST handwritten digit dataset. Serves as a clean baseline for CNN experiments on this platform.</div>
+              </div>
+              <div class="readme-section">
+                <div class="readme-h2">🏗️ Architecture</div>
+                <div class="readme-p">LeNet-5 with two conv layers, two pooling layers, and three fully connected layers. Total params: ~61K.</div>
+                <div class="readme-code">
+                  Conv2d(1→6, 5×5) → MaxPool<br>
+                  Conv2d(6→16, 5×5) → MaxPool<br>
+                  Flatten → FC(400→120→84→10)<br>
+                  Softmax output
+                </div>
+              </div>
+              <div class="readme-section">
+                <div class="readme-h2">🚀 Training</div>
+                <div class="readme-p">Trained for 10 epochs using SGD with momentum 0.9, learning rate 0.001, batch size 64.</div>
+                <div class="readme-code">
+                  Dataset: MNIST (60K train / 10K test)<br>
+                  Optimizer: SGD(lr=0.001, momentum=0.9)<br>
+                  Loss: CrossEntropyLoss<br>
+                  Final test accuracy: 99.2%
+                </div>
+              </div>
+              <div class="readme-section">
+                <div class="readme-h2">📄 License</div>
+                <div class="readme-p">MIT License — see LICENSE file for details.</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+      <div class="frame-dims">480 × auto</div>
+    </div>
+
+  </div><!-- end row 2 -->
+
+  <!-- Design tokens / annotations -->
+  <div class="annotations">
+    <div class="section-label">Design Tokens & Specification</div>
+    <div class="annot-grid">
+
+      <!-- Colors -->
+      <div class="annot-card">
+        <div class="annot-title"><div class="annot-dot"></div>Color Palette</div>
+        <div class="color-swatch-row" style="margin-bottom:12px;">
+          <div class="color-swatch">
+            <div class="color-box" style="background:#f97316;"></div>
+            <div class="color-label">#f97316</div>
+            <div class="color-label">orange-500</div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-box" style="background:#000000;border:1px solid #222;"></div>
+            <div class="color-label">#000000</div>
+            <div class="color-label">bg</div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-box" style="background:#09090b;border:1px solid #222;"></div>
+            <div class="color-label">#09090b</div>
+            <div class="color-label">zinc-950</div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-box" style="background:#27272a;"></div>
+            <div class="color-label">#27272a</div>
+            <div class="color-label">zinc-800</div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-box" style="background:#71717a;"></div>
+            <div class="color-label">#71717a</div>
+            <div class="color-label">zinc-500</div>
+          </div>
+          <div class="color-swatch">
+            <div class="color-box" style="background:#fafafa;"></div>
+            <div class="color-label">#fafafa</div>
+            <div class="color-label">zinc-50</div>
+          </div>
+        </div>
+        <div style="font-size:10px;color:var(--zinc-600);font-family:'JetBrains Mono',monospace;margin-top:4px;">Light mode: teal-600 (#0d9488) as accent</div>
+        <div style="font-size:10px;color:var(--zinc-600);font-family:'JetBrains Mono',monospace;">Dark mode: orange-500 (#f97316) as accent</div>
+      </div>
+
+      <!-- Typography -->
+      <div class="annot-card">
+        <div class="annot-title"><div class="annot-dot"></div>Typography</div>
+        <div class="type-sample">
+          <div class="type-name">display / h1</div>
+          <div class="type-preview hero">Eyenalyze</div>
+        </div>
+        <div class="type-sample">
+          <div class="type-name">heading / h2</div>
+          <div class="type-preview heading">Create New Repository</div>
+        </div>
+        <div class="type-sample">
+          <div class="type-name">body / 12px</div>
+          <div class="type-preview body">CNN model for classifying retinal diseases from fundus images.</div>
+        </div>
+        <div class="type-sample">
+          <div class="type-name">mono / caption / 10px</div>
+          <div class="type-preview caption">Updated At: 22/05/2026 · 247.3 MB</div>
+        </div>
+        <div style="margin-top:8px;font-size:10px;color:var(--zinc-600);font-family:'JetBrains Mono',monospace;">Primary: Sora (sans-serif)<br>Mono: JetBrains Mono</div>
+      </div>
+
+      <!-- Tokens -->
+      <div class="annot-card">
+        <div class="annot-title"><div class="annot-dot"></div>Spacing & Radius</div>
+        <div class="annot-token"><div class="annot-token-name">radius-sm</div><div class="annot-token-val">3px (inputs)</div></div>
+        <div class="annot-token"><div class="annot-token-name">radius-md</div><div class="annot-token-val">4–5px (cards)</div></div>
+        <div class="annot-token"><div class="annot-token-name">radius-lg</div><div class="annot-token-val">6px (tabs)</div></div>
+        <div class="annot-token"><div class="annot-token-name">radius-pill</div><div class="annot-token-val">100px (badges, btns)</div></div>
+        <div class="annot-token"><div class="annot-token-name">page-padding</div><div class="annot-token-val">24–32px</div></div>
+        <div class="annot-token"><div class="annot-token-name">navbar-h</div><div class="annot-token-val">44px</div></div>
+        <div class="annot-token"><div class="annot-token-name">max-content-w</div><div class="annot-token-val">672px (max-w-2xl)</div></div>
+        <div class="annot-token"><div class="annot-token-name">input-h</div><div class="annot-token-val">30px (sm) / 42px (lg)</div></div>
+        <div class="annot-token"><div class="annot-token-name">btn-h</div><div class="annot-token-val">30–34px</div></div>
+        <div class="annot-token"><div class="annot-token-name">step-circle</div><div class="annot-token-val">28px diameter</div></div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- end canvas-area -->
+
+<style>
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+</style>
+
+</body>
+</html>
